@@ -2,43 +2,69 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+/* VICKY KA AI - Futuristic Dark Design System
 All colors MUST be HSL.
 */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Dark futuristic background system */
+    --background: 240 8% 7%;
+    --background-secondary: 240 6% 10%;
+    --background-tertiary: 240 5% 13%;
+    --foreground: 0 0% 98%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    /* Card system with glassmorphism */
+    --card: 240 6% 10%;
+    --card-foreground: 0 0% 95%;
+    --card-border: 240 5% 20%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 240 6% 8%;
+    --popover-foreground: 0 0% 95%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Neon accent system */
+    --neon-green: 150 100% 50%;
+    --neon-purple: 270 100% 56%;
+    --neon-yellow: 48 100% 50%;
+    
+    /* Primary uses neon green */
+    --primary: 150 100% 50%;
+    --primary-foreground: 240 8% 7%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Secondary uses dark grey */
+    --secondary: 240 5% 20%;
+    --secondary-foreground: 0 0% 95%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 240 5% 15%;
+    --muted-foreground: 240 5% 65%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 270 100% 56%;
+    --accent-foreground: 240 8% 7%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 50.6%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 240 5% 20%;
+    --input: 240 5% 15%;
+    --ring: 150 100% 50%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
-    --sidebar-background: 0 0% 98%;
+    /* Gradients for futuristic design */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--neon-green)), hsl(var(--neon-purple)));
+    --gradient-hero: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--background-secondary)) 50%, hsl(var(--background-tertiary)) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(var(--card)) 0%, hsl(var(--background-secondary)) 100%);
+    
+    /* Glow shadows */
+    --shadow-neon-green: 0 0 20px hsl(var(--neon-green) / 0.3);
+    --shadow-neon-purple: 0 0 20px hsl(var(--neon-purple) / 0.3);
+    --shadow-neon-yellow: 0 0 20px hsl(var(--neon-yellow) / 0.3);
+    --shadow-card: 0 8px 32px hsl(240 8% 2% / 0.4);
+    
+    /* Animation timing */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    --sidebar-background: 240 6% 8%;
 
     --sidebar-foreground: 240 5.3% 26.1%;
 
@@ -100,6 +126,90 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+    background: var(--gradient-hero);
   }
+}
+
+@layer components {
+  /* Neon glow button styles */
+  .btn-neon {
+    @apply relative overflow-hidden rounded-lg px-8 py-4 font-semibold transition-all duration-300;
+    background: var(--gradient-primary);
+    box-shadow: 0 0 20px hsl(var(--neon-green) / 0.3);
+  }
+  
+  .btn-neon:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 0 30px hsl(var(--neon-green) / 0.5);
+  }
+  
+  .btn-neon::before {
+    content: '';
+    @apply absolute inset-0 opacity-0 transition-opacity duration-300;
+    background: linear-gradient(45deg, transparent 30%, hsl(var(--neon-yellow) / 0.1) 50%, transparent 70%);
+    animation: shimmer 2s infinite;
+  }
+  
+  .btn-neon:hover::before {
+    @apply opacity-100;
+  }
+
+  /* Glass morphism cards */
+  .glass-card {
+    @apply relative backdrop-blur-sm border rounded-xl;
+    background: linear-gradient(145deg, hsl(var(--card) / 0.8), hsl(var(--background-secondary) / 0.6));
+    border: 1px solid hsl(var(--border) / 0.3);
+    box-shadow: var(--shadow-card);
+  }
+  
+  .glass-card:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: var(--shadow-card), var(--shadow-neon-green);
+    border-color: hsl(var(--neon-green) / 0.3);
+  }
+
+  /* Neon text glow */
+  .text-neon {
+    text-shadow: 0 0 10px currentColor;
+  }
+
+  /* Pulsing animation for CTA buttons */
+  .pulse-neon {
+    animation: pulse-neon 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+}
+
+@layer utilities {
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+@keyframes pulse-neon {
+  0%, 100% {
+    box-shadow: 0 0 20px hsl(var(--neon-green) / 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px hsl(var(--neon-green) / 0.6), 0 0 60px hsl(var(--neon-purple) / 0.2);
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes glow {
+  from { text-shadow: 0 0 10px hsl(var(--neon-green) / 0.5); }
+  to { text-shadow: 0 0 20px hsl(var(--neon-green) / 0.8), 0 0 30px hsl(var(--neon-purple) / 0.3); }
 }
