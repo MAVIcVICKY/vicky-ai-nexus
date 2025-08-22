@@ -1,6 +1,7 @@
 // AI Service for handling multiple API integrations
 const OPENROUTER_API_KEY = "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";
-const GEMINI_API_KEY = "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";
+const CLAUDE_API_KEY = "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";
+const GEMINI_API_KEY = "AIzaSyCWNvpXkkIN88QgYYninlc4YueluvoYyZc";
 
 export interface AIResponse {
   model: string;
@@ -17,7 +18,6 @@ export interface ChatMessage {
 const OPENROUTER_MODELS = {
   "GPT-4": "openai/gpt-4-turbo",
   "GPT-3.5": "openai/gpt-3.5-turbo",
-  "Claude": "anthropic/claude-3-sonnet",
   "DeepSeek": "deepseek/deepseek-chat",
   "Mistral": "mistralai/mistral-7b-instruct"
 };
@@ -66,23 +66,67 @@ async function callOpenRouterAPI(model: string, messages: ChatMessage[]): Promis
   }
 }
 
-async function callGeminiAPI(messages: ChatMessage[]): Promise<AIResponse> {
+async function callClaudeAPI(messages: ChatMessage[]): Promise<AIResponse> {
   try {
-    // For Gemini, we'll also use OpenRouter as they provide Gemini access
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${GEMINI_API_KEY}`,
+        'Authorization': `Bearer ${CLAUDE_API_KEY}`,
         'Content-Type': 'application/json',
-        'HTTP-Referer': window.location.origin,
-        'X-Title': 'VICKY KA AI'
+        'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: GEMINI_MODELS.Gemini,
-        messages: messages,
-        temperature: 0.7,
+        model: 'claude-3-sonnet-20240229',
         max_tokens: 1000,
-        stream: false
+        messages: messages.filter(msg => msg.role !== 'system').map(msg => ({
+          role: msg.role,
+          content: msg.content
+        })),
+        system: messages.find(msg => msg.role === 'system')?.content || "You are VICKY KA AI, a helpful assistant."
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    return {
+      model: "Claude",
+      content: data.content[0]?.text || "No response received from Claude"
+    };
+  } catch (error) {
+    console.error("Error calling Claude API:", error);
+    return {
+      model: "Claude",
+      content: "Error occurred while processing your request with Claude",
+      error: error instanceof Error ? error.message : "Unknown error"
+    };
+  }
+}
+
+async function callGeminiAPI(messages: ChatMessage[]): Promise<AIResponse> {
+  try {
+    // Convert messages to Gemini format
+    const geminiMessages = messages
+      .filter(msg => msg.role !== 'system')
+      .map(msg => ({
+        role: msg.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: msg.content }]
+      }));
+
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contents: geminiMessages,
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 1000,
+        }
       })
     });
 
@@ -94,13 +138,13 @@ async function callGeminiAPI(messages: ChatMessage[]): Promise<AIResponse> {
     
     return {
       model: "Gemini",
-      content: data.choices[0]?.message?.content || "No response received"
+      content: data.candidates[0]?.content?.parts[0]?.text || "No response received from Gemini"
     };
   } catch (error) {
-    console.error("Error calling Gemini:", error);
+    console.error("Error calling Gemini API:", error);
     return {
       model: "Gemini",
-      content: "Error occurred while processing your request",
+      content: "Error occurred while processing your request with Gemini",
       error: error instanceof Error ? error.message : "Unknown error"
     };
   }
@@ -130,10 +174,11 @@ export async function getMultipleAIResponses(
   const promises = selectedModels.map(async (model) => {
     switch (model) {
       case "GPT-4":
-      case "Claude": 
       case "DeepSeek":
       case "Mistral":
         return callOpenRouterAPI(model, messages);
+      case "Claude":
+        return callClaudeAPI(messages);
       case "Gemini":
         return callGeminiAPI(messages);
       case "Perplexity":
