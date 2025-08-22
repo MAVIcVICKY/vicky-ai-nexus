@@ -1,6 +1,6 @@
 // AI Service for handling multiple API integrations
-const OPENROUTER_API_KEY = "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";
-const GEMINI_API_KEY = "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";
+const OPENROUTER_API_KEY = "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";
+const GEMINI_API_KEY = "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";
 
 export interface AIResponse {
   model: string;
