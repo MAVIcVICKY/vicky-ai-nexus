@@ -114,6 +114,22 @@ const ChatPage = () => {
           messages: [...prev[currentChatId].messages, aiMessage]
         }
       }));
+
+      // Auto-update chat title based on conversation (only for first real conversation)
+      const currentChatMessages = chatData[currentChatId]?.messages || [];
+      const isFirstRealMessage = currentChatMessages.filter(msg => msg.isUser).length === 1;
+      
+      if (isFirstRealMessage) {
+        const newTitle = generateChatTitle(currentMessage, aiResponses);
+        setChatData(prev => ({
+          ...prev,
+          [currentChatId]: {
+            ...prev[currentChatId],
+            title: newTitle,
+            timestamp: "Just now"
+          }
+        }));
+      }
       
       // Show success notification
       toast({
@@ -156,6 +172,42 @@ const ChatPage = () => {
         ? prev.filter(m => m !== modelName)
         : [...prev, modelName]
     );
+  };
+
+  // Function to generate chat title from conversation content
+  const generateChatTitle = (userMessage: string, aiResponses: AIResponse[]) => {
+    const text = userMessage.toLowerCase();
+    
+    // Define topic keywords and their corresponding titles
+    const topicMap = {
+      'ai|machine learning|ml|artificial intelligence|deep learning|neural network': 'AI/ML Discussion',
+      'meal|food|recipe|cooking|diet|nutrition|breakfast|lunch|dinner': 'Meal Planning',
+      'code|programming|javascript|python|react|development|coding|software': 'Code Discussion',
+      'health|fitness|exercise|workout|gym|weight|body': 'Health & Fitness',
+      'travel|trip|vacation|holiday|flight|hotel|destination': 'Travel Planning',
+      'business|startup|company|marketing|sales|entrepreneur': 'Business Talk',
+      'education|learning|study|course|school|university|exam': 'Learning Session',
+      'money|finance|investment|budget|crypto|stock|bank': 'Finance Discussion',
+      'movie|film|book|music|entertainment|show|series': 'Entertainment Chat',
+      'weather|climate|temperature|rain|sunny|cloudy': 'Weather Talk',
+      'game|gaming|play|sport|football|cricket|chess': 'Gaming/Sports',
+      'job|career|work|interview|resume|salary|office': 'Career Discussion',
+      'love|relationship|dating|marriage|family|friend': 'Relationship Talk',
+      'tech|technology|gadget|phone|computer|laptop|software': 'Tech Discussion',
+      'car|vehicle|driving|transport|bike|motorcycle': 'Vehicle Talk'
+    };
+
+    // Check for topic matches
+    for (const [keywords, title] of Object.entries(topicMap)) {
+      const regex = new RegExp(keywords, 'i');
+      if (regex.test(text)) {
+        return title;
+      }
+    }
+
+    // Generate title from first few words if no specific topic found
+    const words = userMessage.split(' ').slice(0, 3).join(' ');
+    return words.length > 2 ? `${words}...` : 'General Chat';
   };
 
   const handleNewChat = () => {
