@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Send, MessageSquare, Settings, Plus, Crown, Loader2 } from "lucide-react";
+import { Send, MessageSquare, Settings, Plus, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -11,6 +11,10 @@ const ChatPage = () => {
   const [selectedModels, setSelectedModels] = useState(["GPT-4"]);
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [chatHistory, setChatHistory] = useState([
+    { id: 1, title: "Welcome Chat", timestamp: "Just now", messages: [] }
+  ]);
+  const [currentChatId, setCurrentChatId] = useState(1);
   const { toast } = useToast();
   
   const [messages, setMessages] = useState([
@@ -118,6 +122,48 @@ const ChatPage = () => {
     );
   };
 
+  const handleNewChat = () => {
+    const newChatId = Date.now();
+    const newChat = {
+      id: newChatId,
+      title: `Chat ${chatHistory.length + 1}`,
+      timestamp: "Just now",
+      messages: []
+    };
+    
+    setChatHistory(prev => [...prev, newChat]);
+    setCurrentChatId(newChatId);
+    setMessages([
+      {
+        id: 1,
+        content: "Welcome to VICKY KA AI! Ask me anything and I'll respond using multiple AI models simultaneously.",
+        isUser: false,
+        models: ["System"],
+        responses: []
+      }
+    ]);
+    setMessage("");
+    
+    toast({
+      title: "New chat created!",
+      description: "Start a fresh conversation with AI models."
+    });
+  };
+
+  const switchChat = (chatId: number) => {
+    setCurrentChatId(chatId);
+    // In a real app, you'd load messages from storage
+    setMessages([
+      {
+        id: 1,
+        content: "Welcome to VICKY KA AI! Ask me anything and I'll respond using multiple AI models simultaneously.",
+        isUser: false,
+        models: ["System"],
+        responses: []
+      }
+    ]);
+  };
+
   return (
     <div className="flex h-screen bg-gradient-hero text-foreground">
       {/* Left Sidebar */}
@@ -127,7 +173,7 @@ const ChatPage = () => {
             <MessageSquare className="w-6 h-6 text-neon-green" />
             <h1 className="text-xl font-bold text-neon text-neon-green">VICKY KA AI</h1>
           </div>
-          <Button className="w-full btn-neon" size="sm">
+          <Button className="w-full btn-neon" size="sm" onClick={handleNewChat}>
             <Plus className="w-4 h-4 mr-2" />
             New Chat
           </Button>
@@ -135,20 +181,30 @@ const ChatPage = () => {
         
         {/* Chat History */}
         <div className="flex-1 p-4 space-y-2">
-          <Card className="glass-card p-3 cursor-pointer hover:border-neon-green/50">
-            <p className="text-sm font-medium">Welcome Chat</p>
-            <p className="text-xs text-muted-foreground mt-1">Just now</p>
-          </Card>
+          {chatHistory.map((chat) => (
+            <Card 
+              key={chat.id} 
+              className={`glass-card p-3 cursor-pointer transition-colors ${
+                currentChatId === chat.id 
+                  ? "border-neon-green/70 bg-background-tertiary" 
+                  : "hover:border-neon-green/50"
+              }`}
+              onClick={() => switchChat(chat.id)}
+            >
+              <p className="text-sm font-medium">{chat.title}</p>
+              <p className="text-xs text-muted-foreground mt-1">{chat.timestamp}</p>
+            </Card>
+          ))}
         </div>
 
         <div className="p-4 border-t border-border space-y-2">
-          <Button variant="ghost" className="w-full justify-start">
+          <Button 
+            variant="ghost" 
+            className="w-full justify-start hover:bg-background-tertiary"
+            onClick={() => toast({ title: "Settings", description: "Settings panel coming soon!" })}
+          >
             <Settings className="w-4 h-4 mr-2" />
             Settings
-          </Button>
-          <Button variant="ghost" className="w-full justify-start">
-            <Crown className="w-4 h-4 mr-2 text-neon-yellow" />
-            Upgrade Plan
           </Button>
         </div>
       </div>

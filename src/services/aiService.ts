@@ -18,6 +18,8 @@ export interface ChatMessage {
 const OPENROUTER_MODELS = {
   "GPT-4": "openai/gpt-4-turbo",
   "GPT-3.5": "openai/gpt-3.5-turbo",
+  "Claude": "anthropic/claude-3-sonnet",
+  "Gemini": "google/gemini-pro",
   "DeepSeek": "deepseek/deepseek-chat",
   "Mistral": "mistralai/mistral-7b-instruct"
 };
@@ -174,13 +176,11 @@ export async function getMultipleAIResponses(
   const promises = selectedModels.map(async (model) => {
     switch (model) {
       case "GPT-4":
+      case "Claude":
+      case "Gemini":
       case "DeepSeek":
       case "Mistral":
         return callOpenRouterAPI(model, messages);
-      case "Claude":
-        return callClaudeAPI(messages);
-      case "Gemini":
-        return callGeminiAPI(messages);
       case "Perplexity":
         return callPerplexityAPI(messages);
       case "Grok":
