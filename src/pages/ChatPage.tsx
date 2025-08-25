@@ -11,21 +11,34 @@ const ChatPage = () => {
   const [selectedModels, setSelectedModels] = useState(["GPT-4"]);
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [chatHistory, setChatHistory] = useState([
-    { id: 1, title: "Welcome Chat", timestamp: "Just now", messages: [] }
-  ]);
+  
+  // Store all chat data with their messages
+  const [chatData, setChatData] = useState({
+    1: {
+      title: "Welcome Chat",
+      timestamp: "Just now",
+      messages: [
+        {
+          id: 1,
+          content: "Welcome to VICKY KA AI! Ask me anything and I'll respond using multiple AI models simultaneously.",
+          isUser: false,
+          models: ["System"],
+          responses: []
+        }
+      ]
+    }
+  });
+  
   const [currentChatId, setCurrentChatId] = useState(1);
   const { toast } = useToast();
   
-  const [messages, setMessages] = useState([
-    {
-      id: 1,
-      content: "Welcome to VICKY KA AI! Ask me anything and I'll respond using multiple AI models simultaneously.",
-      isUser: false,
-      models: ["System"],
-      responses: []
-    }
-  ]);
+  // Get current chat messages
+  const messages = chatData[currentChatId]?.messages || [];
+  const chatHistory = Object.keys(chatData).map(id => ({
+    id: parseInt(id),
+    title: chatData[id].title,
+    timestamp: chatData[id].timestamp
+  }));
 
   const aiModels = [
     { name: "GPT-4", color: "neon-green", status: "active" },
@@ -48,15 +61,24 @@ const ChatPage = () => {
       return;
     }
     
+    const currentMessages = chatData[currentChatId]?.messages || [];
     const userMessage = {
-      id: messages.length + 1,
+      id: currentMessages.length + 1,
       content: message,
       isUser: true,
       models: [],
       responses: []
     };
     
-    setMessages(prev => [...prev, userMessage]);
+    // Add user message to current chat
+    setChatData(prev => ({
+      ...prev,
+      [currentChatId]: {
+        ...prev[currentChatId],
+        messages: [...currentMessages, userMessage]
+      }
+    }));
+    
     const currentMessage = message;
     setMessage("");
     setIsLoading(true);
@@ -65,7 +87,7 @@ const ChatPage = () => {
       // Prepare conversation history for API
       const conversationHistory: ChatMessage[] = [
         { role: 'system', content: 'You are VICKY KA AI, a helpful assistant that provides comprehensive and accurate responses.' },
-        ...messages.filter(msg => !msg.models.includes("System")).map(msg => ({
+        ...currentMessages.filter(msg => !msg.models.includes("System")).map(msg => ({
           role: msg.isUser ? 'user' as const : 'assistant' as const,
           content: msg.content
         })),
@@ -77,14 +99,21 @@ const ChatPage = () => {
       
       // Create AI response message
       const aiMessage = {
-        id: messages.length + 2,
+        id: currentMessages.length + 2,
         content: `Responses from ${selectedModels.length} AI models:`,
         isUser: false,
         models: selectedModels,
         responses: aiResponses
       };
       
-      setMessages(prev => [...prev, aiMessage]);
+      // Add AI response to current chat
+      setChatData(prev => ({
+        ...prev,
+        [currentChatId]: {
+          ...prev[currentChatId],
+          messages: [...prev[currentChatId].messages, aiMessage]
+        }
+      }));
       
       // Show success notification
       toast({
@@ -100,15 +129,22 @@ const ChatPage = () => {
         variant: "destructive"
       });
       
-      // Add error message
+      // Add error message to current chat
       const errorMessage = {
-        id: messages.length + 2,
+        id: currentMessages.length + 2,
         content: "Sorry, there was an error processing your request. Please try again.",
         isUser: false,
         models: ["Error"],
         responses: []
       };
-      setMessages(prev => [...prev, errorMessage]);
+      
+      setChatData(prev => ({
+        ...prev,
+        [currentChatId]: {
+          ...prev[currentChatId],
+          messages: [...prev[currentChatId].messages, errorMessage]
+        }
+      }));
     } finally {
       setIsLoading(false);
     }
@@ -124,24 +160,26 @@ const ChatPage = () => {
 
   const handleNewChat = () => {
     const newChatId = Date.now();
-    const newChat = {
-      id: newChatId,
-      title: `Chat ${chatHistory.length + 1}`,
-      timestamp: "Just now",
-      messages: []
-    };
     
-    setChatHistory(prev => [...prev, newChat]);
-    setCurrentChatId(newChatId);
-    setMessages([
-      {
-        id: 1,
-        content: "Welcome to VICKY KA AI! Ask me anything and I'll respond using multiple AI models simultaneously.",
-        isUser: false,
-        models: ["System"],
-        responses: []
+    // Add new chat to chatData
+    setChatData(prev => ({
+      ...prev,
+      [newChatId]: {
+        title: `Chat ${Object.keys(prev).length + 1}`,
+        timestamp: "Just now",
+        messages: [
+          {
+            id: 1,
+            content: "Welcome to VICKY KA AI! Ask me anything and I'll respond using multiple AI models simultaneously.",
+            isUser: false,
+            models: ["System"],
+            responses: []
+          }
+        ]
       }
-    ]);
+    }));
+    
+    setCurrentChatId(newChatId);
     setMessage("");
     
     toast({
@@ -152,16 +190,7 @@ const ChatPage = () => {
 
   const switchChat = (chatId: number) => {
     setCurrentChatId(chatId);
-    // In a real app, you'd load messages from storage
-    setMessages([
-      {
-        id: 1,
-        content: "Welcome to VICKY KA AI! Ask me anything and I'll respond using multiple AI models simultaneously.",
-        isUser: false,
-        models: ["System"],
-        responses: []
-      }
-    ]);
+    // Messages are automatically loaded from chatData[chatId]
   };
 
   return (
