@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Send, MessageSquare, Settings, Plus, Loader2 } from "lucide-react";
+import { Send, MessageSquare, Settings, Plus, Loader2, Edit3, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -11,6 +11,10 @@ const ChatPage = () => {
   const [selectedModels, setSelectedModels] = useState(["GPT-4"]);
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Edit state management
+  const [editingChatId, setEditingChatId] = useState<number | null>(null);
+  const [editTitle, setEditTitle] = useState("");
   
   // Store all chat data with their messages
   const [chatData, setChatData] = useState({
@@ -115,9 +119,10 @@ const ChatPage = () => {
         }
       }));
 
-      // Auto-update chat title based on conversation (only for first real conversation)
-      const currentChatMessages = chatData[currentChatId]?.messages || [];
-      const isFirstRealMessage = currentChatMessages.filter(msg => msg.isUser).length === 1;
+      // Auto-update chat title based on conversation (only for first real message)
+      // Count user messages before this update
+      const userMessagesBefore = currentMessages.filter(msg => msg.isUser).length;
+      const isFirstRealMessage = userMessagesBefore === 1; // This user message is the first one
       
       if (isFirstRealMessage) {
         const newTitle = generateChatTitle(currentMessage, aiResponses);
@@ -242,7 +247,39 @@ const ChatPage = () => {
 
   const switchChat = (chatId: number) => {
     setCurrentChatId(chatId);
-    // Messages are automatically loaded from chatData[chatId]
+    // Cancel any ongoing edit when switching chats
+    setEditingChatId(null);
+  };
+
+  // Edit functionality
+  const startEditing = (chatId: number, currentTitle: string) => {
+    setEditingChatId(chatId);
+    setEditTitle(currentTitle);
+  };
+
+  const cancelEditing = () => {
+    setEditingChatId(null);
+    setEditTitle("");
+  };
+
+  const saveTitle = (chatId: number) => {
+    if (editTitle.trim()) {
+      setChatData(prev => ({
+        ...prev,
+        [chatId]: {
+          ...prev[chatId],
+          title: editTitle.trim()
+        }
+      }));
+      
+      toast({
+        title: "Title updated!",
+        description: "Chat name has been changed successfully."
+      });
+    }
+    
+    setEditingChatId(null);
+    setEditTitle("");
   };
 
   return (
@@ -265,15 +302,67 @@ const ChatPage = () => {
           {chatHistory.map((chat) => (
             <Card 
               key={chat.id} 
-              className={`glass-card p-3 cursor-pointer transition-colors ${
+              className={`glass-card p-3 transition-colors ${
                 currentChatId === chat.id 
                   ? "border-neon-green/70 bg-background-tertiary" 
                   : "hover:border-neon-green/50"
               }`}
-              onClick={() => switchChat(chat.id)}
             >
-              <p className="text-sm font-medium">{chat.title}</p>
-              <p className="text-xs text-muted-foreground mt-1">{chat.timestamp}</p>
+              {editingChatId === chat.id ? (
+                // Edit mode
+                <div className="space-y-2">
+                  <Input
+                    value={editTitle}
+                    onChange={(e) => setEditTitle(e.target.value)}
+                    className="text-sm bg-background border-border focus:border-neon-green/50"
+                    onKeyPress={(e) => {
+                      if (e.key === "Enter") saveTitle(chat.id);
+                      if (e.key === "Escape") cancelEditing();
+                    }}
+                    autoFocus
+                  />
+                  <div className="flex gap-1">
+                    <Button 
+                      size="sm" 
+                      variant="ghost" 
+                      className="h-6 px-2 text-neon-green hover:bg-neon-green/10"
+                      onClick={() => saveTitle(chat.id)}
+                    >
+                      <Check className="w-3 h-3" />
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="ghost" 
+                      className="h-6 px-2 text-red-400 hover:bg-red-400/10"
+                      onClick={cancelEditing}
+                    >
+                      <X className="w-3 h-3" />
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                // View mode
+                <div className="flex items-start justify-between group">
+                  <div 
+                    className="flex-1 cursor-pointer" 
+                    onClick={() => switchChat(chat.id)}
+                  >
+                    <p className="text-sm font-medium">{chat.title}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{chat.timestamp}</p>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-neon-green"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      startEditing(chat.id, chat.title);
+                    }}
+                  >
+                    <Edit3 className="w-3 h-3" />
+                  </Button>
+                </div>
+              )}
             </Card>
           ))}
         </div>
