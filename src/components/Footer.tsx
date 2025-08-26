@@ -11,7 +11,7 @@ const Footer = () => {
     support: [
       { name: "Documentation", href: "/docs" },
       { name: "Help Center", href: "/help" },
-      { name: "Discord", href: "https://discord.gg/vickyka-ai" },
+      { name: "Discord", href: "https://discord.gg/viesta-ai" },
       { name: "Status", href: "/status" }
     ],
     company: [
@@ -42,8 +42,8 @@ const Footer = () => {
                 <Brain className="w-6 h-6 text-background" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-neon animate-glow">VICKY KA AI</h3>
-                <p className="text-xs text-neon-purple">AI ka Shaktimaan</p>
+                <h3 className="text-xl font-bold text-neon animate-glow">VIESTA</h3>
+                <p className="text-xs text-neon-purple">AI Powerhouse</p>
               </div>
             </div>
             <p className="text-muted-foreground leading-relaxed mb-6">
@@ -52,19 +52,19 @@ const Footer = () => {
             </p>
             <div className="flex gap-4">
               <a 
-                href="https://twitter.com/vickyka-ai" 
+                href="https://twitter.com/viesta_ai" 
                 className="glass-card p-3 rounded-lg hover:border-neon-green/40 transition-all group"
               >
                 <Twitter className="w-4 h-4 text-muted-foreground group-hover:text-neon-green transition-colors" />
               </a>
               <a 
-                href="https://github.com/vickyka-ai" 
+                href="https://github.com/viesta-ai" 
                 className="glass-card p-3 rounded-lg hover:border-neon-purple/40 transition-all group"
               >
                 <Github className="w-4 h-4 text-muted-foreground group-hover:text-neon-purple transition-colors" />
               </a>
               <a 
-                href="mailto:hello@vickyka.ai" 
+                href="mailto:hello@viesta.ai" 
                 className="glass-card p-3 rounded-lg hover:border-neon-yellow/40 transition-all group"
               >
                 <Mail className="w-4 h-4 text-muted-foreground group-hover:text-neon-yellow transition-colors" />
@@ -142,7 +142,7 @@ const Footer = () => {
         <div className="border-t border-border/30 pt-8 mt-12">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <span>© 2024 AI ka Shaktimaan</span>
+              <span>© 2024 VIESTA</span>
               <span>•</span>
               <span>Made with</span>
               <Heart className="w-4 h-4 text-neon-purple fill-current animate-pulse" />

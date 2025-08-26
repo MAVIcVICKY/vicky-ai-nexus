@@ -20,7 +20,7 @@ const HeroSection = () => {
           {/* Main Headlines */}
           <div className="mb-8 animate-fade-in-up">
             <h1 className="text-6xl lg:text-8xl font-bold mb-6 text-neon animate-glow">
-              VICKY KA AI
+              VIESTA
             </h1>
             <div className="text-4xl lg:text-6xl font-bold mb-4 bg-gradient-primary bg-clip-text text-transparent">
               ALL IN ONE
