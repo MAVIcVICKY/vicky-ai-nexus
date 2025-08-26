@@ -24,7 +24,7 @@ const ChatPage = () => {
       messages: [
         {
           id: 1,
-          content: "Welcome to VICKY KA AI! Ask me anything and I'll respond using multiple AI models simultaneously.",
+          content: "Welcome to VIESTA! Ask me anything and I'll respond using multiple AI models simultaneously.",
           isUser: false,
           models: ["System"],
           responses: []
@@ -90,7 +90,7 @@ const ChatPage = () => {
     try {
       // Prepare conversation history for API
       const conversationHistory: ChatMessage[] = [
-        { role: 'system', content: 'You are VICKY KA AI, a helpful assistant that provides comprehensive and accurate responses.' },
+        { role: 'system', content: 'You are VIESTA, a helpful assistant that provides comprehensive and accurate responses.' },
         ...currentMessages.filter(msg => !msg.models.includes("System")).map(msg => ({
           role: msg.isUser ? 'user' as const : 'assistant' as const,
           content: msg.content
@@ -227,7 +227,7 @@ const ChatPage = () => {
         messages: [
           {
             id: 1,
-            content: "Welcome to VICKY KA AI! Ask me anything and I'll respond using multiple AI models simultaneously.",
+            content: "Welcome to VIESTA! Ask me anything and I'll respond using multiple AI models simultaneously.",
             isUser: false,
             models: ["System"],
             responses: []
@@ -289,7 +289,7 @@ const ChatPage = () => {
         <div className="p-4 border-b border-border">
           <div className="flex items-center gap-2 mb-4">
             <MessageSquare className="w-6 h-6 text-neon-green" />
-            <h1 className="text-xl font-bold text-neon text-neon-green">VICKY KA AI</h1>
+            <h1 className="text-xl font-bold text-neon text-neon-green">VIESTA</h1>
           </div>
           <Button className="w-full btn-neon" size="sm" onClick={handleNewChat}>
             <Plus className="w-4 h-4 mr-2" />
@@ -402,70 +402,94 @@ const ChatPage = () => {
         </div>
 
         {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+        <div className="flex-1 overflow-y-auto p-6">
           {messages.map((msg) => (
-            <div
-              key={msg.id}
-              className={`flex ${msg.isUser ? "justify-end" : "justify-start"}`}
-            >
-              <div
-                className={`max-w-4xl glass-card p-4 ${
-                  msg.isUser 
-                    ? "bg-gradient-primary text-background ml-12" 
-                    : "bg-background-secondary mr-12"
-                }`}
-              >
-                <p className="text-sm mb-2">{msg.content}</p>
-                
-                {/* Show individual AI responses */}
-                {msg.responses && msg.responses.length > 0 && (
-                  <div className="space-y-3 mt-4">
-                    {msg.responses.map((response: AIResponse, index: number) => (
-                      <div key={index} className="glass-card p-3 bg-background-tertiary rounded-lg">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Badge 
-                            variant={response.error ? "destructive" : "default"}
-                            className="text-xs"
-                          >
-                            {response.model}
-                          </Badge>
-                          {response.error && (
-                            <span className="text-xs text-red-400">Failed</span>
-                          )}
-                        </div>
-                        <p className="text-sm text-muted-foreground leading-relaxed">
-                          {response.content}
-                        </p>
+            <div key={msg.id} className="mb-6">
+              {msg.isUser ? (
+                <div className="flex justify-end mb-4">
+                  <div className="max-w-2xl glass-card p-4 bg-gradient-primary text-background ml-12">
+                    <p className="text-sm">{msg.content}</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {/* System message */}
+                  {msg.models.includes("System") && (
+                    <div className="flex justify-start">
+                      <div className="max-w-2xl glass-card p-4 bg-background-secondary mr-12">
+                        <p className="text-sm mb-2">{msg.content}</p>
+                        <Badge variant="outline" className="text-xs">System</Badge>
                       </div>
-                    ))}
-                  </div>
-                )}
-                
-                {/* Show model badges for system messages */}
-                {msg.models.length > 0 && !msg.responses?.length && (
-                  <div className="flex gap-1 mt-2">
-                    {msg.models.map((model) => (
-                      <Badge key={model} variant="outline" className="text-xs">
-                        {model}
-                      </Badge>
-                    ))}
-                  </div>
-                )}
-              </div>
+                    </div>
+                  )}
+                  
+                  {/* AI responses in vertical layout */}
+                  {msg.responses && msg.responses.length > 0 && (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                      {msg.responses.map((response: AIResponse, index: number) => (
+                        <div key={index} className="glass-card bg-background-secondary border border-border/50 hover:border-neon-green/30 transition-all duration-200">
+                          {/* AI Model Header */}
+                          <div className="p-3 border-b border-border/30 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <div className={`w-2 h-2 rounded-full ${response.error ? 'bg-red-400' : 'bg-neon-green'} ${!response.error && 'animate-pulse'}`}></div>
+                              <Badge 
+                                variant={response.error ? "destructive" : "default"}
+                                className={`text-xs font-medium ${!response.error && 'bg-neon-green/20 text-neon-green border-neon-green/30'}`}
+                              >
+                                {response.model}
+                              </Badge>
+                            </div>
+                            {response.error && (
+                              <span className="text-xs text-red-400 font-medium">Failed</span>
+                            )}
+                          </div>
+                          
+                          {/* AI Response Content */}
+                          <div className="p-4">
+                            <div className="text-sm text-foreground leading-relaxed min-h-[120px] max-h-[400px] overflow-y-auto">
+                              {response.error ? (
+                                <div className="text-red-400 italic">
+                                  Unable to get response from {response.model}
+                                </div>
+                              ) : (
+                                <div className="prose prose-sm dark:prose-invert max-w-none">
+                                  {response.content.split('\n').map((line, i) => (
+                                    <p key={i} className="mb-2 last:mb-0">{line}</p>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           ))}
           
           {/* Loading indicator */}
           {isLoading && (
-            <div className="flex justify-start">
-              <div className="max-w-4xl glass-card p-4 bg-background-secondary mr-12">
-                <div className="flex items-center gap-2">
-                  <Loader2 className="w-4 h-4 animate-spin text-neon-green" />
-                  <span className="text-sm text-muted-foreground">
-                    Getting responses from {selectedModels.length} AI models...
-                  </span>
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 mb-6">
+              {selectedModels.map((model, index) => (
+                <div key={model} className="glass-card bg-background-secondary border border-border/50">
+                  <div className="p-3 border-b border-border/30 flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-neon-yellow animate-pulse"></div>
+                    <Badge className="text-xs bg-neon-yellow/20 text-neon-yellow border-neon-yellow/30">
+                      {model}
+                    </Badge>
+                  </div>
+                  <div className="p-4">
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="w-4 h-4 animate-spin text-neon-green" />
+                      <span className="text-sm text-muted-foreground">
+                        Generating response...
+                      </span>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              ))}
             </div>
           )}
         </div>
@@ -476,7 +500,7 @@ const ChatPage = () => {
             <Input
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="Ask VICKY KA AI anything..."
+              placeholder="Ask VIESTA anything..."
               className="flex-1 bg-background-secondary border-border focus:border-neon-green/50 focus:ring-neon-green/20"
               onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
             />
@@ -493,7 +517,7 @@ const ChatPage = () => {
             </Button>
           </div>
           <p className="text-xs text-muted-foreground text-center mt-2">
-            {selectedModels.length} models selected • Powered by VICKY KA AI
+            {selectedModels.length} models selected • Powered by VIESTA
           </p>
         </div>
       </div>
