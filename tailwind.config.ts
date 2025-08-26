@@ -146,6 +146,12 @@ export default {
 				'float': 'float 6s ease-in-out infinite',
 				'glow': 'glow 2s ease-in-out infinite alternate',
 				'fade-in-up': 'fade-in-up 0.6s ease-out'
+			},
+			animationDelay: {
+				'300': '0.3s',
+				'600': '0.6s',
+				'1000': '1s',
+				'2000': '2s'
 			}
 		}
 	},
