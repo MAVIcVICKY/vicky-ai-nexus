@@ -46,11 +46,10 @@ const ChatPage = () => {
 
   const aiModels = [
     { name: "GPT-4", color: "neon-green", status: "active" },
-    { name: "Claude", color: "neon-purple", status: "active" },
-    { name: "Gemini", color: "neon-yellow", status: "active" },
+    { name: "Claude", color: "neon-green", status: "active" },
+    { name: "Gemini", color: "neon-green", status: "active" },
     { name: "Perplexity", color: "neon-green", status: "active" },
-    { name: "DeepSeek", color: "neon-purple", status: "active" },
-    { name: "Mistral", color: "neon-yellow", status: "active" }
+    { name: "DeepSeek", color: "neon-green", status: "active" }
   ];
 
   const handleSendMessage = async () => {
@@ -390,7 +389,7 @@ const ChatPage = () => {
                 variant={selectedModels.includes(model.name) ? "default" : "secondary"}
                 className={`cursor-pointer transition-all hover:scale-105 ${
                   selectedModels.includes(model.name) 
-                    ? `bg-${model.color} text-background shadow-neon-green` 
+                    ? "bg-neon-green text-background shadow-neon-green" 
                     : "hover:border-neon-green/30"
                 }`}
                 onClick={() => toggleModel(model.name)}
