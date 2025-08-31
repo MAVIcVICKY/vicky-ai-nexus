@@ -16,8 +16,8 @@ export interface ChatMessage {
 
 // OpenRouter API models configuration  
 const OPENROUTER_MODELS = {
-  "GPT-4": "openai/gpt-4o-mini",
-  "GPT-3.5": "openai/gpt-3.5-turbo",
+  "GPT-4": "openai/gpt-3.5-turbo",
+  "GPT-3.5": "openai/gpt-3.5-turbo", 
   "Claude": "anthropic/claude-3.5-sonnet",
   "Gemini": "google/gemini-1.5-flash",
   "DeepSeek": "deepseek/deepseek-chat",
@@ -177,10 +177,11 @@ export async function getMultipleAIResponses(
     switch (model) {
       case "GPT-4":
       case "Claude":
-      case "Gemini":
       case "DeepSeek":
       case "Mistral":
         return callOpenRouterAPI(model, messages);
+      case "Gemini":
+        return callGeminiAPI(messages);
       case "Perplexity":
         return callPerplexityAPI(messages);
       case "Grok":
