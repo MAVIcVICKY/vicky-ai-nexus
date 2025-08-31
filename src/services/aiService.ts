@@ -14,12 +14,12 @@ export interface ChatMessage {
   content: string;
 }
 
-// OpenRouter API models configuration
+// OpenRouter API models configuration  
 const OPENROUTER_MODELS = {
-  "GPT-4": "openai/gpt-4-turbo",
+  "GPT-4": "openai/gpt-4o-mini",
   "GPT-3.5": "openai/gpt-3.5-turbo",
-  "Claude": "anthropic/claude-3-sonnet",
-  "Gemini": "google/gemini-pro",
+  "Claude": "anthropic/claude-3.5-sonnet",
+  "Gemini": "google/gemini-1.5-flash",
   "DeepSeek": "deepseek/deepseek-chat",
   "Mistral": "mistralai/mistral-7b-instruct"
 };
@@ -43,7 +43,7 @@ async function callOpenRouterAPI(model: string, messages: ChatMessage[]): Promis
         model: OPENROUTER_MODELS[model as keyof typeof OPENROUTER_MODELS],
         messages: messages,
         temperature: 0.7,
-        max_tokens: 1000,
+        max_tokens: 500,
         stream: false
       })
     });
