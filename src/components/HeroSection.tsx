@@ -11,8 +11,8 @@ const HeroSection = () => {
       {/* Animated background elements */}
       <div className="absolute inset-0 opacity-20">
         <div className="absolute top-20 left-20 w-72 h-72 bg-neon-green/10 rounded-full blur-3xl animate-float"></div>
-        <div className="absolute bottom-40 right-20 w-96 h-96 bg-neon-purple/10 rounded-full blur-3xl animate-float animation-delay-2000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-neon-yellow/10 rounded-full blur-3xl animate-float animation-delay-1000"></div>
+        <div className="absolute bottom-40 right-20 w-96 h-96 bg-neon-purple/10 rounded-full blur-3xl animate-float [animation-delay:2s]"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-neon-yellow/10 rounded-full blur-3xl animate-float [animation-delay:1s]"></div>
       </div>
 
       <div className="container mx-auto px-6 lg:px-8 relative z-10">
@@ -32,7 +32,7 @@ const HeroSection = () => {
           </div>
 
           {/* Hero Image */}
-          <div className="mb-12 animate-fade-in-up animation-delay-300">
+          <div className="mb-12 animate-fade-in-up [animation-delay:0.3s]">
             <div className="relative max-w-4xl mx-auto">
               <img 
                 src={heroImage} 
@@ -45,14 +45,14 @@ const HeroSection = () => {
               <div className="absolute -top-4 -right-4 glass-card p-3 animate-float">
                 <Sparkles className="w-6 h-6 text-neon-yellow" />
               </div>
-              <div className="absolute -bottom-4 -left-4 glass-card p-3 animate-float animation-delay-1000">
+              <div className="absolute -bottom-4 -left-4 glass-card p-3 animate-float [animation-delay:1s]">
                 <div className="w-3 h-3 bg-neon-green rounded-full animate-pulse"></div>
               </div>
             </div>
           </div>
 
           {/* CTA Button */}
-          <div className="animate-fade-in-up animation-delay-600">
+          <div className="animate-fade-in-up [animation-delay:0.6s]">
             <Button
               onClick={() => navigate("/chat")}
               className="btn-neon pulse-neon text-lg px-12 py-6 group"
