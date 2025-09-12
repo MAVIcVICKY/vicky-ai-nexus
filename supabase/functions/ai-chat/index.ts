@@ -75,12 +75,12 @@ async function callOpenRouterAPI(model: string, messages: ChatMessage[]): Promis
 }
 
 async function callGeminiAPI(messages: ChatMessage[]): Promise<AIResponse> {
-  const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
+  const GEMINI_API_KEY = Deno.env.get('GOOGLE_API_KEY');
   
   if (!GEMINI_API_KEY) {
     return {
       model: "Gemini",
-      content: "Gemini API key not configured",
+      content: "Google API key not configured",
       error: "Missing API key"
     };
   }

@@ -1,13 +1,11 @@
 // AI Service for handling multiple API integrations via Supabase Edge Functions
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseUrl = 'https://your-project.supabase.co';
+const supabaseAnonKey = 'your-anon-key';
 
-// Create client only if env vars exist to prevent runtime crash
-const supabase = (supabaseUrl && supabaseAnonKey)
-  ? createClient(supabaseUrl as string, supabaseAnonKey as string)
-  : null;
+// Create client with hardcoded values for now - they'll be replaced when deployed
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export interface AIResponse {
   model: string;
@@ -20,45 +18,14 @@ export interface ChatMessage {
   content: string;
 }
 
-async function callEdgeFunctionFallback(payload: { selectedModels: string[]; messages: ChatMessage[] }) {
-  const endpoints = [
-    '/functions/v1/ai-chat',
-    '/ai-chat'
-  ];
-  for (const url of endpoints) {
-    try {
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      if (res.ok) {
-        return await res.json();
-      }
-    } catch (_) {
-      // try next endpoint
-    }
-  }
-  throw new Error('All edge function fallbacks failed');
-}
-
 export async function getMultipleAIResponses(
   selectedModels: string[], 
   messages: ChatMessage[]
 ): Promise<AIResponse[]> {
   try {
-    let data: any = null;
-    let error: any = null;
-
-    if (supabase) {
-      const res = await supabase.functions.invoke('ai-chat', {
-        body: { selectedModels, messages }
-      });
-      data = res.data;
-      error = res.error;
-    } else {
-      data = await callEdgeFunctionFallback({ selectedModels, messages });
-    }
+    const { data, error } = await supabase.functions.invoke('ai-chat', {
+      body: { selectedModels, messages }
+    });
 
     if (error) {
       console.error('Error calling Edge Function:', error);
