@@ -1,12 +1,10 @@
 // AI Service for handling multiple API integrations via Supabase Edge Functions
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = 'https://your-project.supabase.co';
-const supabaseAnonKey = 'your-anon-key';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-// Detect placeholder config; if present, skip Supabase client and use HTTP fallback
-const isPlaceholder = !supabaseUrl || supabaseUrl.includes('your-project') || !supabaseAnonKey || supabaseAnonKey === 'your-anon-key';
-const supabase = !isPlaceholder ? createClient(supabaseUrl, supabaseAnonKey) : null as any;
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export interface AIResponse {
   model: string;
@@ -19,46 +17,14 @@ export interface ChatMessage {
   content: string;
 }
 
-// Fallback to call Edge Function via relative path when Supabase client isn't configured
-async function callEdgeFunctionFallback(payload: { selectedModels: string[]; messages: ChatMessage[] }) {
-  const endpoints = [
-    '/functions/v1/ai-chat',
-    '/ai-chat'
-  ];
-  for (const url of endpoints) {
-    try {
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      if (res.ok) {
-        return await res.json();
-      }
-    } catch (_) {
-      // try next endpoint
-    }
-  }
-  throw new Error('All edge function fallbacks failed');
-}
-
 export async function getMultipleAIResponses(
   selectedModels: string[], 
   messages: ChatMessage[]
 ): Promise<AIResponse[]> {
   try {
-    let data: any = null;
-    let error: any = null;
-
-    if (supabase) {
-      const res = await supabase.functions.invoke('ai-chat', {
-        body: { selectedModels, messages }
-      });
-      data = res.data;
-      error = res.error;
-    } else {
-      data = await callEdgeFunctionFallback({ selectedModels, messages });
-    }
+    const { data, error } = await supabase.functions.invoke('ai-chat', {
+      body: { selectedModels, messages }
+    });
 
     if (error) {
       console.error('Error calling Edge Function:', error);
