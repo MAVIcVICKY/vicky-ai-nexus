@@ -22,9 +22,15 @@ export async function getMultipleAIResponses(
   messages: ChatMessage[]
 ): Promise<AIResponse[]> {
   try {
+    console.log('Calling Supabase edge function with:', { selectedModels, messages });
+    console.log('Supabase URL:', supabaseUrl);
+    console.log('Supabase client created:', !!supabase);
+    
     const { data, error } = await supabase.functions.invoke('ai-chat', {
       body: { selectedModels, messages }
     });
+
+    console.log('Edge function response:', { data, error });
 
     if (error) {
       console.error('Error calling Edge Function:', error);
