@@ -129,6 +129,11 @@ All colors MUST be HSL.
     @apply bg-background text-foreground font-sans;
     background: var(--gradient-hero);
   }
+
+  /* Ensure fade-in animations work properly */
+  .animate-fade-in-up {
+    animation: fade-in-up 0.6s ease-out forwards;
+  }
 }
 
 @layer components {
